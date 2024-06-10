@@ -1,3 +1,4 @@
+from cgitb import text
 from tkinter import Tk, BOTH, Canvas
 from typing import Tuple
 
@@ -20,8 +21,17 @@ class Line:
         canvas.create_line(self.p1.xy(), self.p2.xy(), fill=fill_color, width=2)
 
 
+class Text:
+    def __init__(self, text, p1: Point) -> None:
+        self.p1 = p1
+        self.text = text
+
+    def draw(self, canvas: Canvas) -> None:
+        canvas.create_text(*self.p1.xy(), text=self.text, fill="black")
+
+
 class Window:
-    def __init__(self, width, height) -> None:
+    def __init__(self, width: int, height: int) -> None:
         self.width = width
         self.height = height
 
@@ -44,6 +54,9 @@ class Window:
 
     def draw(self, line: Line, fill_color: str = "black") -> None:
         line.draw(self.__canvas, fill_color)
+
+    def draw_text(self, text: Text) -> None:
+        text.draw(self.__canvas)
 
     def wait_for_close(self) -> None:
         self.__running = True

@@ -3,29 +3,21 @@ from graphics import (
     Point,
     Line,
 )
-from cell import Cell
-from functools import reduce
+from maze import Maze
 
 
 def main():
     win = Window(800, 600)
-    cx, cy = win.center()
 
-    c = Cell(win)
-    c.has_left_wall = False
-    c.draw(50, 50, 100, 100)
+    # num_cols = (win.width) // 40
+    # num_rows = (win.height) // 35
 
-    c = Cell(win)
-    c.has_right_wall = False
-    c.draw(125, 125, 200, 200)
+    # m1 = Maze(40, 40, num_rows, num_cols, 40, 40, win)
 
-    c = Cell(win)
-    c.has_bottom_wall = False
-    c.draw(225, 225, 250, 250)
+    num_cols = (win.width) // 100
+    num_rows = (win.height) // 100
 
-    c = Cell(win)
-    c.has_top_wall = False
-    c.draw(300, 300, 500, 500)
+    m1 = Maze(40, 40, num_rows, num_cols, 100, 100, win)
 
     win.wait_for_close()
 
