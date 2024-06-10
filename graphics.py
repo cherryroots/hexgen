@@ -17,8 +17,8 @@ class Line:
         self.p1 = p1
         self.p2 = p2
 
-    def draw(self, canvas: Canvas, fill_color: str) -> None:
-        canvas.create_line(self.p1.xy(), self.p2.xy(), fill=fill_color, width=2)
+    def draw(self, canvas: Canvas, fill_color: str, width: int) -> None:
+        canvas.create_line(self.p1.xy(), self.p2.xy(), fill=fill_color, width=width)
 
 
 class Text:
@@ -52,8 +52,8 @@ class Window:
         self.__root.update_idletasks()
         self.__root.update()
 
-    def draw(self, line: Line, fill_color: str = "black") -> None:
-        line.draw(self.__canvas, fill_color)
+    def draw(self, line: Line, fill_color: str = "black", width=2) -> None:
+        line.draw(self.__canvas, fill_color, width)
 
     def draw_text(self, text: Text) -> None:
         text.draw(self.__canvas)

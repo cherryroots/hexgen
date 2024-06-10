@@ -62,4 +62,4 @@ class Maze:
         if self._win is None:
             return
         self._win.redraw()
-        # sleep(0.005)
+        sleep(0.01)

@@ -11,14 +11,6 @@ from graphics import (
 )
 
 
-class OffsetCoord:
-    def __init__(self, col: int, row: int):
-        self.col, self.row = col, row
-
-    def coords(self) -> Tuple[int, int]:
-        return self.col, self.row
-
-
 class Hex:
     def __init__(self, col: int, row: int, win: Window = None, walls: int = 6) -> None:
         self.walls = [True] * walls
@@ -26,9 +18,8 @@ class Hex:
         self._row = row
         self.q, self.r = oddr_to_axial(self._col, self._row)
         self.s = -self.q - self.r
-        if self.q + self.r + self.s != 0:
-            raise Exception("invalid hex")
         self._cx, self._cy = 0, 0
+        self.visited = False
         self.__win = win
 
     def __eq__(self, other):
@@ -38,13 +29,12 @@ class Hex:
         return not (self == other)
 
     def __add__(self, other):
-        return Hex(self.q + other.q, self.r + other.r, self.s + other.s)
+        axial = axial_to_oddr(self.q + other.q, self.r + other.r)
+        return Hex(*axial)
 
     def __sub__(self, other):
-        return Hex(self.q - other.q, self.r - other.r, self.s - other.s)
-
-    def __mul__(self, other: int):
-        return Hex(self.q * other, self.r * other, self.s * other)
+        axial = axial_to_oddr(self.q + other.q, self.r + other.r)
+        return Hex(*axial)
 
     def corners(self, width: int, height: int) -> List[Tuple[int, int]]:
         walls = len(self.walls)
@@ -59,15 +49,23 @@ class Hex:
     def hex_direction(self, direction: int):
         return hex_directions[(6 + (direction % 6)) % 6]
 
-    def hex_length(self, other):
-        return int((abs(other.q) + abs(other.r) + abs(other.s)) / 2)
+    def hex_neighbor(self, direction: int):
+        return self + self.hex_direction(direction)
 
-    def hex_distance(self, other):
-        return self.hex_length(self.hex_subtract(self, other))
+    def hex_neignbors(self) -> List[Tuple[int, int, int]]:
+        neighbors = []
+        for i in range(6):
+            neighbor: Hex = self.hex_neighbor(i)
+            neighbors.append(axial_to_oddr(neighbor.q, neighbor.r))
+
+        return neighbors
 
     def draw(self, cx: float, cy: float, width: int, height: int) -> None:
         self._cx, self._cy = cx, cy
-        text = Text(f"q{self.q}, r{self.r}\n  s{self.s}", Point(self._cx, self._cy))
+        text = Text(
+            f"c{self._col}, r{self._row}\n\nq{self.q}, r{self.r}\n  s{self.s}",
+            Point(self._cx, self._cy),
+        )
 
         corners = self.corners(width, height)
 
@@ -75,18 +73,35 @@ class Hex:
         lines = [Line(p1, p2) for p1, p2 in zip(corners, corners[1:] + [corners[0]])]
 
         for wall, line in zip(self.walls, lines):
-            self.__win.draw(line, "black" if wall else "white")
+            self.__win.draw(line, "black" if wall else "white", 2 if wall else 4)
 
         self.__win.draw_text(text)
 
-    def draw_move(self, to_cell, undo: bool = False):
+    def draw_move(self, other, undo: bool = False):
         origin = Point(self._cx, self._cy)
-        destination = Point(to_cell._cx, to_cell._cy)
+        destination = Point(other._cx, other._cy)
         line = Line(origin, destination)
         self.__win.draw(line, "gray" if undo else "red")
 
-    def break_between(self, to_cell):
-        pass
+    def break_wall(self, direction: int):
+        self.walls[direction] = False
+
+    def break_between(self, other):
+        delta_q = other.q - self.q
+        delta_r = other.r - self.r
+
+        if delta_q == 1 and delta_r == 0:  # E
+            self.break_wall(0)
+        if delta_q == 1 and delta_r == -1:  # NE
+            self.break_wall(1)
+        if delta_q == 0 and delta_r == -1:  # NW
+            self.break_wall(2)
+        if delta_q == -1 and delta_r == 0:  # W
+            self.break_wall(3)
+        if delta_q == -1 and delta_r == 1:  # SW
+            self.break_wall(4)
+        if delta_q == 0 and delta_r == 1:  # SE
+            self.break_wall(5)
 
 
 def axial_to_oddr(q: int, r: int):
