@@ -73,10 +73,6 @@ class Hex:
 
     def draw(self, cx: float, cy: float, width: int, height: int) -> None:
         self._cx, self._cy = cx, cy
-        text = Text(
-            f"c{self._col}, r{self._row}\n\nq{self.q}, r{self.r}\n  s{self.s}",
-            Point(self._cx, self._cy),
-        )
 
         corners = self.corners(width, height)
 
@@ -86,7 +82,13 @@ class Hex:
         for wall, line in zip(self.walls, lines):
             self.__win.draw(line, "black" if wall else "white", 2 if wall else 4)
 
+        """
+        text = Text(
+            f"c{self._col}, r{self._row}\n\nq{self.q}, r{self.r}\n  s{self.s}",
+            Point(self._cx, self._cy),
+        )
         self.__win.draw_text(text)
+        """
 
     def draw_move(self, other: "Hex", undo: bool = False):
         origin = Point(self._cx, self._cy)

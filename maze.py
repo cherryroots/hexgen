@@ -69,7 +69,7 @@ class Maze:
         if self._win is None:
             return
         self._win.redraw()
-        sleep(0.05)
+        sleep(0.01)
 
     def _reset_visited(self) -> None:
         for col in self._cells:

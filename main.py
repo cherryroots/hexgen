@@ -11,10 +11,10 @@ from typing import List
 def main():
     win = Window(800, 600)
 
-    num_cols = (win.width) // 100
-    num_rows = (win.height) // 100
+    num_cols = (win.width) // 50
+    num_rows = (win.height) // 50
 
-    m1 = Maze(25, 60, num_rows, num_cols, 100, 100, win, 10)
+    m1 = Maze(25, 60, num_rows, num_cols, 50, 50, win)
 
     m1._break_walls_r(0, 0)
     m1._reset_visited()
