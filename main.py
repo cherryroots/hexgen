@@ -5,44 +5,34 @@ from graphics import (
 )
 from maze import Maze
 from hex import Hex
+from typing import List
 
 
 def main():
     win = Window(800, 600)
 
-    # num_cols = (win.width) // 40
-    # num_rows = (win.height) // 35
-
-    # m1 = Maze(40, 40, num_rows, num_cols, 40, 40, win)
-
     num_cols = (win.width) // 100
     num_rows = (win.height) // 100
 
-    m1 = Maze(40, 40, num_rows, num_cols, 100, 100, win)
-    cell: Hex = m1._cells[1][1]
-    neighbors = cell.hex_neignbors()
+    m1 = Maze(25, 60, num_rows, num_cols, 100, 100, win, 0)
+    cell: Hex = m1._cells[3][num_rows // 2]
+    neighbors: List[Point] = cell.bounded_neighbors(num_cols, num_rows)
     last = None
     for n in neighbors:
-        neighbor: Hex = m1._cells[n[0]][n[1]]
+        neighbor: Hex = m1._cells[n.x][n.y]
         if last is None:
             cell.break_between(neighbor)
             neighbor.break_between(cell)
-            m1._draw_cells(1, 1)
+            m1._draw_cells(cell._col, cell._row)
             cell.draw_move(neighbor)
         else:
             last.break_between(neighbor)
             neighbor.break_between(last)
-            m1._draw_cells(n[0], n[1])
+            m1._draw_cells(n.x, n.y)
             last.draw_move(neighbor)
         last = neighbor
 
-    print(m1._cells[1][1].walls)
-    print(m1._cells[2][1].walls)
-    print(m1._cells[2][0].walls)
-    print(m1._cells[1][0].walls)
-    print(m1._cells[0][1].walls)
-    print(m1._cells[1][2].walls)
-    print(m1._cells[2][2].walls)
+    m1._break_entrance_and_exit()
 
     win.wait_for_close()
 

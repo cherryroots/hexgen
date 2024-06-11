@@ -1,4 +1,5 @@
 from math import sqrt
+import random
 from time import sleep
 from hex import Hex
 from graphics import Window
@@ -15,6 +16,7 @@ class Maze:
         cell_size_x: int,
         cell_size_y: int,
         win: Window = None,
+        seed=None,
     ):
         self._x1 = x1
         self._y1 = y1
@@ -24,10 +26,13 @@ class Maze:
         self._cell_size_y = cell_size_y
         self._win = win
 
+        if seed:
+            random.seed(seed)
+
         self._cells = []  # list of columns of rows
         self._create_cells()
 
-    def _create_cells(self):
+    def _create_cells(self) -> None:
         for i in range(self._num_cols):
             column = []
             for j in range(self._num_rows):
@@ -38,7 +43,7 @@ class Maze:
             for j in range(len(self._cells[i])):
                 self._draw_cells(i, j)
 
-    def _draw_cells(self, i, j):
+    def _draw_cells(self, i, j) -> None:
         if self._win is None:
             return
 
@@ -46,7 +51,7 @@ class Maze:
         vert = 3 / 2 * self._cell_size_x / 2
         horiz_offset = horiz / 2 if j % 2 != False else 0
 
-        top_left_x = self._y1 + i * horiz
+        top_left_x = self._x1 + i * horiz
         top_left_y = self._y1 + j * vert
         bottom_right_x = top_left_x + self._cell_size_x
         bottom_right_y = top_left_y + self._cell_size_y
@@ -58,8 +63,19 @@ class Maze:
         hex.draw(cx, cy, self._cell_size_x, self._cell_size_y)
         self._animate()
 
-    def _animate(self):
+    def _animate(self) -> None:
         if self._win is None:
             return
         self._win.redraw()
         sleep(0.01)
+
+    def _break_entrance_and_exit(self) -> None:
+        start: Hex = self._cells[0][0]
+        end: Hex = self._cells[self._num_cols - 1][self._num_rows - 1]
+        start.break_wall(2)
+        self._draw_cells(start._col, start._row)
+        end.break_wall(5)
+        self._draw_cells(end._col, end._row)
+
+    def _break_walls_r(self, i, j) -> None:
+        pass

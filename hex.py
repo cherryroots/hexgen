@@ -22,6 +22,9 @@ class Hex:
         self.visited = False
         self.__win = win
 
+    def __repr__(self) -> str:
+        return f"(Hex(({self._col}, {self._row}), {self.walls}, {self.visited})"
+
     def __eq__(self, other):
         return self.q == other.q and self.r == other.r and self.s == other.s
 
@@ -46,19 +49,27 @@ class Hex:
             corners.append((x, y))
         return corners
 
-    def hex_direction(self, direction: int):
+    def direction(self, direction: int):
         return hex_directions[(6 + (direction % 6)) % 6]
 
-    def hex_neighbor(self, direction: int):
-        return self + self.hex_direction(direction)
+    def neighbor(self, direction: int):
+        return self + self.direction(direction)
 
-    def hex_neignbors(self) -> List[Tuple[int, int, int]]:
+    def neignbors(self) -> List[Point]:
         neighbors = []
         for i in range(6):
-            neighbor: Hex = self.hex_neighbor(i)
-            neighbors.append(axial_to_oddr(neighbor.q, neighbor.r))
+            neighbor: Hex = self.neighbor(i)
+            coords = Point(*axial_to_oddr(neighbor.q, neighbor.r))
+            neighbors.append(coords)
 
         return neighbors
+
+    def bounded_neighbors(self, cols: int, rows: int) -> List[Point]:
+        discard_filter = filter(
+            lambda p: p.x >= 0 and p.x < cols and p.y >= 0 and p.y < rows,
+            self.neignbors(),
+        )
+        return list(discard_filter)
 
     def draw(self, cx: float, cy: float, width: int, height: int) -> None:
         self._cx, self._cy = cx, cy

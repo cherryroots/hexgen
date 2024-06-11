@@ -8,6 +8,9 @@ class Point:
         self.x = x
         self.y = y
 
+    def __repr__(self) -> str:
+        return f"Point({self.x}, {self.y})"
+
     def xy(self) -> Tuple[int, int]:
         return self.x, self.y
 
@@ -17,6 +20,9 @@ class Line:
         self.p1 = p1
         self.p2 = p2
 
+    def __repr__(self) -> str:
+        return f"Line({self.p1}, {self.p2})"
+
     def draw(self, canvas: Canvas, fill_color: str, width: int) -> None:
         canvas.create_line(self.p1.xy(), self.p2.xy(), fill=fill_color, width=width)
 
@@ -25,6 +31,9 @@ class Text:
     def __init__(self, text, p1: Point) -> None:
         self.p1 = p1
         self.text = text
+
+    def __repr__(self) -> str:
+        return f"Text('{self.text}', {self.p1})"
 
     def draw(self, canvas: Canvas) -> None:
         canvas.create_text(*self.p1.xy(), text=self.text, fill="black")
