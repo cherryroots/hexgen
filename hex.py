@@ -25,17 +25,17 @@ class Hex:
     def __repr__(self) -> str:
         return f"(Hex(({self._col}, {self._row}), {self.walls}, {self.visited})"
 
-    def __eq__(self, other):
+    def __eq__(self, other: "Hex"):
         return self.q == other.q and self.r == other.r and self.s == other.s
 
-    def __nq__(self, other):
+    def __nq__(self, other: "Hex"):
         return not (self == other)
 
-    def __add__(self, other):
+    def __add__(self, other: "Hex") -> "Hex":
         axial = axial_to_oddr(self.q + other.q, self.r + other.r)
         return Hex(*axial)
 
-    def __sub__(self, other):
+    def __sub__(self, other: "Hex") -> "Hex":
         axial = axial_to_oddr(self.q + other.q, self.r + other.r)
         return Hex(*axial)
 
@@ -88,7 +88,7 @@ class Hex:
 
         self.__win.draw_text(text)
 
-    def draw_move(self, other, undo: bool = False):
+    def draw_move(self, other: "Hex", undo: bool = False):
         origin = Point(self._cx, self._cy)
         destination = Point(other._cx, other._cy)
         line = Line(origin, destination)
@@ -97,7 +97,10 @@ class Hex:
     def break_wall(self, direction: int):
         self.walls[direction] = False
 
-    def break_between(self, other):
+    def wall_towards(self, direction: int):
+        return self.walls[direction]
+
+    def break_between(self, other: "Hex"):
         delta_q = other.q - self.q
         delta_r = other.r - self.r
 
@@ -113,6 +116,23 @@ class Hex:
             self.break_wall(4)
         if delta_q == 0 and delta_r == 1:  # SE
             self.break_wall(5)
+
+    def wall_between(self, other: "Hex"):
+        delta_q = other.q - self.q
+        delta_r = other.r - self.r
+
+        if delta_q == 1 and delta_r == 0:  # E
+            return self.wall_towards(0)
+        if delta_q == 1 and delta_r == -1:  # NE
+            return self.wall_towards(1)
+        if delta_q == 0 and delta_r == -1:  # NW
+            return self.wall_towards(2)
+        if delta_q == -1 and delta_r == 0:  # W
+            return self.wall_towards(3)
+        if delta_q == -1 and delta_r == 1:  # SW
+            return self.wall_towards(4)
+        if delta_q == 0 and delta_r == 1:  # SE
+            return self.wall_towards(5)
 
 
 def axial_to_oddr(q: int, r: int):

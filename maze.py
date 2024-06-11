@@ -1,8 +1,10 @@
 from math import sqrt
+from operator import ne
 import random
 from time import sleep
+
 from hex import Hex
-from graphics import Window
+from graphics import Window, Point
 from typing import List
 
 
@@ -29,7 +31,7 @@ class Maze:
         if seed:
             random.seed(seed)
 
-        self._cells = []  # list of columns of rows
+        self._cells: List[List[Hex]] = []  # list of columns of rows
         self._create_cells()
 
     def _create_cells(self) -> None:
@@ -43,7 +45,7 @@ class Maze:
             for j in range(len(self._cells[i])):
                 self._draw_cells(i, j)
 
-    def _draw_cells(self, i, j) -> None:
+    def _draw_cells(self, i: int, j: int) -> None:
         if self._win is None:
             return
 
@@ -59,7 +61,7 @@ class Maze:
         cx = ((top_left_x + bottom_right_x) / 2) + horiz_offset
         cy = (top_left_y + bottom_right_y) / 2
 
-        hex: Hex = self._cells[i][j]
+        hex = self._cells[i][j]
         hex.draw(cx, cy, self._cell_size_x, self._cell_size_y)
         self._animate()
 
@@ -67,15 +69,68 @@ class Maze:
         if self._win is None:
             return
         self._win.redraw()
-        sleep(0.01)
+        sleep(0.05)
+
+    def _reset_visited(self) -> None:
+        for col in self._cells:
+            for hex in col:
+                hex.visited = False
 
     def _break_entrance_and_exit(self) -> None:
-        start: Hex = self._cells[0][0]
-        end: Hex = self._cells[self._num_cols - 1][self._num_rows - 1]
+        start = self._cells[0][0]
+        end = self._cells[self._num_cols - 1][self._num_rows - 1]
         start.break_wall(2)
         self._draw_cells(start._col, start._row)
         end.break_wall(5)
         self._draw_cells(end._col, end._row)
 
-    def _break_walls_r(self, i, j) -> None:
-        pass
+    def _break_walls_r(self, i: int, j: int) -> None:
+        current = self._cells[i][j]
+        current.visited = True
+        while True:
+            to_visit = []
+            neighbors = current.bounded_neighbors(self._num_cols, self._num_rows)
+            for point in neighbors:
+                neighbor = self._cells[point.x][point.y]
+                if not neighbor.visited:
+                    to_visit.append(point)
+
+            if len(to_visit) == 0:
+                self._draw_cells(i, j)
+                return
+
+            direction = random.randrange(len(to_visit))
+            point = to_visit[direction]
+            next = self._cells[point.x][point.y]
+
+            current.break_between(next)
+            next.break_between(current)
+            self._break_walls_r(point.x, point.y)
+
+    def _solve_r(self, i: int, j: int):
+        self._animate()
+
+        current = self._cells[i][j]
+        current.visited = True
+
+        if i == self._num_cols - 1 and j == self._num_rows - 1:
+            return True
+
+        neighbors = current.bounded_neighbors(self._num_cols, self._num_rows)
+
+        for point in neighbors:
+            neighbor = self._cells[point.x][point.y]
+            if neighbor.visited:
+                continue
+            if current.wall_between(neighbor) or neighbor.wall_between(current):
+                continue
+            current.draw_move(neighbor)
+            res = self._solve_r(neighbor._col, neighbor._row)
+            if res:
+                return res
+            current.draw_move(neighbor, undo=True)
+
+        return False
+
+    def solve(self):
+        return self._solve_r(0, 0)
