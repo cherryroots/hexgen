@@ -1,25 +1,28 @@
+from time import sleep
 from graphics import (
     Window,
     Point,
-    Line,
 )
 from maze import Maze
-from hex import Hex
-from typing import List
 
 
 def main():
     win = Window(800, 600)
 
-    num_cols = (win.width) // 50
-    num_rows = (win.height) // 50
+    num_cols = (win.width) // 45
+    num_rows = (win.height) // 40
 
-    m1 = Maze(25, 60, num_rows, num_cols, 50, 50, win)
+    for i in range(0, num_cols, num_cols // 2):
+        win.clear()
+        start = Point(0 + i, 0)
+        end = Point(num_cols - 1 - i, num_rows - 1)
+        m = Maze(20, 15, num_rows, num_cols, 50, 50, win, start, end)
 
-    m1._break_walls_r(0, 0)
-    m1._reset_visited()
-    m1._break_entrance_and_exit()
-    m1.solve()
+        m._break_entrance_and_exit()
+        m._break_walls_r(*start.xy())
+        m._reset_visited()
+        m.solve()
+        sleep(2)
 
     win.wait_for_close()
 

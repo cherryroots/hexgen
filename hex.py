@@ -7,7 +7,6 @@ from graphics import (
     Window,
     Point,
     Line,
-    Text,
 )
 
 
@@ -80,7 +79,7 @@ class Hex:
         lines = [Line(p1, p2) for p1, p2 in zip(corners, corners[1:] + [corners[0]])]
 
         for wall, line in zip(self.walls, lines):
-            self.__win.draw(line, "black" if wall else "white", 2 if wall else 4)
+            self.__win.draw(line, "black" if wall else "#3199b7", 2 if wall else 4)
 
         """
         text = Text(
@@ -94,7 +93,7 @@ class Hex:
         origin = Point(self._cx, self._cy)
         destination = Point(other._cx, other._cy)
         line = Line(origin, destination)
-        self.__win.draw(line, "gray" if undo else "red")
+        self.__win.draw(line, "#e5b068" if undo else "#cffb95", 3)
 
     def break_wall(self, direction: int):
         self.walls[direction] = False

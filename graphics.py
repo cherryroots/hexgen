@@ -48,11 +48,14 @@ class Window:
         self.__root.title("hexgen")
         self.__root.resizable(0, 0)
 
-        self.__canvas = Canvas(self.__root, bg="white", height=height, width=width)
+        self.__canvas = Canvas(self.__root, bg="#3199b7", height=height, width=width)
         self.__canvas.pack(fill=BOTH, expand=1)
 
         self.__running = False
         self.__root.protocol("WM_DELETE_WINDOW", self.close)
+
+    def clear(self) -> None:
+        self.__canvas.delete("all")
 
     def center(self) -> Tuple[int, int]:
         return self.width / 2, self.height / 2

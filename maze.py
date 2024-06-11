@@ -1,5 +1,4 @@
 from math import sqrt
-from operator import ne
 import random
 from time import sleep
 
@@ -18,6 +17,8 @@ class Maze:
         cell_size_x: int,
         cell_size_y: int,
         win: Window = None,
+        start: Point = None,
+        end: Point = None,
         seed=None,
     ):
         self._x1 = x1
@@ -27,6 +28,11 @@ class Maze:
         self._cell_size_x = cell_size_x
         self._cell_size_y = cell_size_y
         self._win = win
+
+        self._start = Point(0, 0) if start is None else start
+        self._end = (
+            Point(self._num_cols - 1, self._num_rows - 1) if end is None else end
+        )
 
         if seed:
             random.seed(seed)
@@ -77,8 +83,8 @@ class Maze:
                 hex.visited = False
 
     def _break_entrance_and_exit(self) -> None:
-        start = self._cells[0][0]
-        end = self._cells[self._num_cols - 1][self._num_rows - 1]
+        start = self._cells[self._start.x][self._start.y]
+        end = self._cells[self._end.x][self._end.y]
         start.break_wall(2)
         self._draw_cells(start._col, start._row)
         end.break_wall(5)
@@ -113,7 +119,7 @@ class Maze:
         current = self._cells[i][j]
         current.visited = True
 
-        if i == self._num_cols - 1 and j == self._num_rows - 1:
+        if i == self._end.x and j == self._end.y:
             return True
 
         neighbors = current.bounded_neighbors(self._num_cols, self._num_rows)
@@ -125,12 +131,11 @@ class Maze:
             if current.wall_between(neighbor) or neighbor.wall_between(current):
                 continue
             current.draw_move(neighbor)
-            res = self._solve_r(neighbor._col, neighbor._row)
-            if res:
-                return res
+            if self._solve_r(neighbor._col, neighbor._row):
+                return True
             current.draw_move(neighbor, undo=True)
 
         return False
 
     def solve(self):
-        return self._solve_r(0, 0)
+        return self._solve_r(*self._start.xy())
