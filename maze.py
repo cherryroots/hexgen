@@ -57,7 +57,7 @@ class Maze:
 
         horiz = sqrt(3) * self._cell_size_y / 2
         vert = 3 / 2 * self._cell_size_x / 2
-        horiz_offset = horiz / 2 if j % 2 != False else 0
+        horiz_offset = horiz / 2 if j % 2 == 1 else 0
 
         top_left_x = self._x1 + i * horiz
         top_left_y = self._y1 + j * vert
