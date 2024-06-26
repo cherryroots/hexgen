@@ -48,13 +48,13 @@ class Hex:
             corners.append((x, y))
         return corners
 
-    def direction(self, direction: int):
+    def direction(self, direction: int) -> "Hex":
         return hex_directions[(6 + (direction % 6)) % 6]
 
-    def neighbor(self, direction: int):
+    def neighbor(self, direction: int) -> "Hex":
         return self + self.direction(direction)
 
-    def neignbors(self) -> List[Point]:
+    def neighbors(self) -> List[Point]:
         neighbors = []
         for i in range(6):
             neighbor: Hex = self.neighbor(i)
@@ -64,11 +64,11 @@ class Hex:
         return neighbors
 
     def bounded_neighbors(self, cols: int, rows: int) -> List[Point]:
-        discard_filter = filter(
+        filtered_neighbors = filter(
             lambda p: p.x >= 0 and p.x < cols and p.y >= 0 and p.y < rows,
-            self.neignbors(),
+            self.neighbors(),
         )
-        return list(discard_filter)
+        return list(filtered_neighbors)
 
     def draw(self, cx: float, cy: float, width: int, height: int) -> None:
         self._cx, self._cy = cx, cy

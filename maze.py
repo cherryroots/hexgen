@@ -96,22 +96,22 @@ class Maze:
         while True:
             to_visit = []
             neighbors = current.bounded_neighbors(self._num_cols, self._num_rows)
-            for point in neighbors:
-                neighbor = self._cells[point.x][point.y]
+            for p in neighbors:
+                neighbor = self._cells[p.x][p.y]
                 if not neighbor.visited:
-                    to_visit.append(point)
+                    to_visit.append(p)
 
             if len(to_visit) == 0:
                 self._draw_cells(i, j)
                 return
 
             direction = random.randrange(len(to_visit))
-            point = to_visit[direction]
-            next = self._cells[point.x][point.y]
+            p = to_visit[direction]
+            next = self._cells[p.x][p.y]
 
             current.break_between(next)
             next.break_between(current)
-            self._break_walls_r(point.x, point.y)
+            self._break_walls_r(p.x, p.y)
 
     def _solve_r(self, i: int, j: int):
         self._animate()
@@ -124,8 +124,8 @@ class Maze:
 
         neighbors = current.bounded_neighbors(self._num_cols, self._num_rows)
 
-        for point in neighbors:
-            neighbor = self._cells[point.x][point.y]
+        for p in neighbors:
+            neighbor = self._cells[p.x][p.y]
             if neighbor.visited:
                 continue
             if current.wall_between(neighbor) or neighbor.wall_between(current):
